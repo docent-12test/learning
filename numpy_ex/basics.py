@@ -1,12 +1,11 @@
 """
 Basic functionalities of numpy
 """
-import ctypes
-
+from lib import ansi
 import numpy as np
 
 
-def print_info(array: np.array):
+def print_info(array: np.array, label:str = None):
     """
     Prints detailed information about the given numpy array, such as its shape,
     data type, number of dimensions, size, memory usage, transposed array, various
@@ -18,7 +17,9 @@ def print_info(array: np.array):
     :param arr: A numpy array subject to inspection.
     :type arr: np.array
     """
-    print(f"value: {array}")
+    if label:
+        print(f"{ansi.RED}################  {label} ##########:{ansi.RESET}")
+    print(f"value: {ansi.GREEN}{array}{ansi.RESET}")
     print(f"shape : {array.shape}")
     print(f"dtype : {array.dtype}")
     print(f"ndim : {array.ndim}")
@@ -37,6 +38,7 @@ def print_info(array: np.array):
     print(f"argmax() : {array.argmax()}")
     print(f"argmin() : {array.argmin()}")
     print(f"T : {array.T}")
+    print()
 
 
 def dump(array: np.array):
@@ -46,7 +48,6 @@ def dump(array: np.array):
 
 def change(array:np.array):
     print(f"sort() : {array.sort()}")
-    print(f"value: {array}")
     print(f" : {array.sort(axis=0)}")
     print(f" : {array.sort(axis=1)}")
     print(f" : {array.sort(axis=None)}")
