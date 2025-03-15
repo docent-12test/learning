@@ -45,3 +45,31 @@ BG_BRIGHT_BLUE = "\033[104m"
 BG_BRIGHT_MAGENTA = "\033[105m"
 BG_BRIGHT_CYAN = "\033[106m"
 BG_BRIGHT_WHITE = "\033[107m"
+
+def reset():
+    print(RESET, end='')
+
+def red():
+    reset()
+    print(RED, end='')
+
+def green():
+    reset()
+    print(GREEN, end='')
+
+def yellow():
+    reset()
+    print(YELLOW, end='')
+
+def blue():
+    reset()
+    print(BLUE, end='')
+
+def magenta():
+    reset()
+    print(MAGENTA, end='')
+
+def print_red(text):
+    red()
+    print(text)
+    reset()

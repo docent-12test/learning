@@ -1,3 +1,5 @@
+from lib.ansi import red, green, blue, yellow, print_red
+from lib.psystem import print_dict
 import numpy as np
 
 freq = {
@@ -10,18 +12,24 @@ freq = {
 "Si B": 493.88
 }
 
-print(freq)
+print_dict(freq, "frequencies")
 
+
+red()
 o4 = [(4, key, value) for key, value in freq.items()]
 print(o4)
 
-
+green()
 octave4 = np.array(o4)
 # tuples worden lists, alles wordt string
 print(octave4)
 
+yellow()
 octave4 = np.array(o4, dtype=[('octave', 'i2'), ('key', 'S6'), ('freq', 'f4')])
 print(octave4)
+
+blue()
+print(octave4['freq'])
 
 
 res = octave4.copy()

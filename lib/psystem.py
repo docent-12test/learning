@@ -1,16 +1,70 @@
-import numpy as np
-import ctypes
+import os
+from typing import Optional, Iterable, Any
+from lib.framework import MustBeTested
 
-# Maak een voorbeeldarray
-array = np.array([[1, 2], [3, 4]], dtype=np.int32)
+NL = os.linesep
 
-# Toegang krijgen tot het rauwe geheugen via de buffer
-buffer_pointer = array.data  # Dit is de geheugenbuffer
 
-# Verwerk het geheugeninhoud in ctypes
-size_in_bytes = array.nbytes
-memory_contents = (ctypes.c_ubyte * size_in_bytes).from_address(ctypes.addressof(buffer_pointer.contents))
 
-# Dump de bytes in hexadecimale vorm
-dumped_memory = [hex(byte) for byte in memory_contents]
-print("Memory contents (in hex):", dumped_memory)
+
+@MustBeTested
+def same_type(collection:Optional[Iterable[Any]]) -> bool:
+    """
+    Checks if all elements in the given collection are of the same type.
+
+    This function evaluates the types of all elements in a collection to
+    determine whether they are the same. If the collection is empty, it
+    returns False. Otherwise, it maps the type of each element in the
+    returns False. Otherwise, it maps the type of each element in the
+    collection, constructs a set to identify unique types, and checks
+    if there is only one type present.
+
+    :param collection: The collection of elements to evaluate.
+                       It can be any iterable containing elements.
+    :type collection: Iterable[Any]
+    :return: True if all elements in the collection are of the same type,
+             False otherwise, or if the collection is empty.
+    :rtype: bool
+    """
+    if not collection:
+        return False
+    return len(set(map(type, collection))) == 1
+
+
+def print_dict(dict_:dict, text:str = "", debug: bool = False)->None:
+    """
+    Prints the dictionary in a readable format to the console and provides detailed
+    debug information if the debug flag is enabled.
+
+    :param dict_: Dictionary to be printed.
+       :type dict_: dict
+    :param text: Optional label or name for the dictionary, default is an empty
+       string.
+       :type text: str
+    :param debug: Flag to enable debug output, default is False.
+       :type debug: bool
+    :return: None
+    """
+    if debug:
+        print("################")
+    print(f"Dict '{text}' {{")
+    for k, v in dict_.items():
+        print(f"  {k.__repr__()} : {v.__repr__()}")
+    print("}")
+    if debug:
+        print(f"info of dict ({text}) : {len(dict_)} items")
+        if same_type(dict_.keys()):
+            print("keys are type consistent")
+        else:
+            print("keys are not type consistent")
+
+        if same_type(dict_.keys()):
+            print("values are type consistent")
+        else:
+            print("values  are not type  consistent")
+        print("################")
+
+
+def info(var, text:str="", debug: bool = False):
+    if isinstance(var, dict):
+        print_dict(var, text, debug)
