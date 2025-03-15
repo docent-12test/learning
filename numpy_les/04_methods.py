@@ -19,6 +19,8 @@ basics.print_info(np.sin(arr), "sin")
 basics.print_info(np.cos(arr), "cos")
 basics.print_info(np.cosh(arr), "cosh")
 
+print(arr < arr.mean())
+
 
 
 
