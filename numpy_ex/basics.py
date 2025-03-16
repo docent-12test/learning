@@ -37,7 +37,6 @@ def print_info(array: np.array, label:str = None):
     print(f"flatten : {array.flatten()}")
     print(f"argmax() : {array.argmax()}")
     print(f"argmin() : {array.argmin()}")
-    print(f"T : {array.T}")
     print()
 
 

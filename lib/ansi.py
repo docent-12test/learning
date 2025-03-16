@@ -1,3 +1,7 @@
+"""
+Ansi console styling module
+"""
+
 # ANSI-stijl reset
 RESET = "\033[0m"
 
@@ -46,30 +50,127 @@ BG_BRIGHT_MAGENTA = "\033[105m"
 BG_BRIGHT_CYAN = "\033[106m"
 BG_BRIGHT_WHITE = "\033[107m"
 
+
 def reset():
+    """
+    Resets the terminal display to its default settings.
+
+    This function outputs the ANSI escape sequence
+    stored in the global `RESET` variable. It is intended
+    to restore the terminal's visual appearance after it
+    has been modified by other terminal-based styling
+    or formatting commands. It does not return any value.
+   """
     print(RESET, end='')
 
+
 def red():
+    """
+    Provides a function to reset the terminal color and set it to red.
+    """
     reset()
     print(RED, end='')
 
+
 def green():
+    """
+    Provides a function to reset the terminal color and set it to green
+    """
     reset()
     print(GREEN, end='')
 
+
 def yellow():
+    """
+    Provides a function to reset the terminal color and set it to yellow.
+    """
     reset()
     print(YELLOW, end='')
 
+
 def blue():
+    """
+    Provides a function to reset the terminal color and set it to blue.
+    """
     reset()
     print(BLUE, end='')
 
+
 def magenta():
+    """
+    Provides a function to reset the terminal color and set it to magenta.
+    """
     reset()
     print(MAGENTA, end='')
 
+
 def print_red(text):
+    """
+    Prints the given text in red color.
+
+    This function formats the provided text to be displayed in red
+    color by utilizing the necessary commands. It ensures that the
+    text output is temporarily styled in red and then resets the
+    styling after being printed.
+    """
     red()
+    print(text)
+    reset()
+
+
+def print_green(text):
+    """
+    Prints the given text in green color.
+
+    This function formats the provided text to be displayed in green
+    color by utilizing the necessary commands. It ensures that the
+    text output is temporarily styled in red and then resets the
+    styling after being printed.
+    """
+
+    green()
+    print(text)
+    reset()
+
+
+def print_yellow(text):
+    """
+    Prints the given text in yellow color.
+
+    This function formats the provided text to be displayed in yellow
+    color by utilizing the necessary commands. It ensures that the
+    text output is temporarily styled in red and then resets the
+    styling after being printed.
+    """
+    yellow()
+    print(text)
+    reset()
+
+
+def print_blue(text):
+    """
+    Prints the given text in blue  color.
+
+    This function formats the provided text to be displayed in blue
+    color by utilizing the necessary commands. It ensures that the
+    text output is temporarily styled in red and then resets the
+    styling after being printed.
+    """
+    blue()
+    print(text)
+    reset()
+
+
+def print_magenta(text):
+    """
+    Prints the given text in magenta color.
+
+    This function formats the provided text to be displayed in magenta
+    color by utilizing the necessary commands. It ensures that the
+    text output is temporarily styled in red and then resets the
+    styling after being printed.
+    """
+
+    magenta()
     print(text)
     reset()
