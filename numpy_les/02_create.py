@@ -92,7 +92,7 @@ basics.print_info(arr)
 arr = np.array([[1, 2], [3, 4]])
 arr = np.diag(arr)
 
-arr = np.indices((4,2,3))
+arr = np.empty((3, 4))
 basics.print_info(arr)
 
 #

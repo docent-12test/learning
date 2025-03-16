@@ -2,6 +2,11 @@ import time
 
 import numpy as np
 
+### indices
+arr = np.indices((4,2,3))
+basics.print_info(arr)
+
+
 ### order parameter in array
 
 N = 10000
