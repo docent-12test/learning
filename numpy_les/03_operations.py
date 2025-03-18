@@ -34,6 +34,7 @@ count = 20
 arr = np.arange(10, 20).reshape(2, 5)
 for i in range(count):
     arr = arr ** (1 / factor)
+print(arr)
 
 for i in range(count):
     arr = arr ** factor
@@ -46,6 +47,7 @@ for i in range(count):
     for y in range(len(l)):
         for x in range(len(l[y])):
             l[y][x] = l[y][x] ** (1 / factor)
+
 for i in range(count):
     for y in range(len(l)):
         for x in range(len(l[y])):

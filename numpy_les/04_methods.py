@@ -16,8 +16,10 @@ arr.sort()
 print(arr)
 arr = np.arange(-5, 19).reshape(4, 6)
 basics.print_info(np.sin(arr), "sin")
+print(arr)
 basics.print_info(np.cos(arr), "cos")
 basics.print_info(np.cosh(arr), "cosh")
+basics.print_info(np.sqrt(arr), "cosh")
 
 print(arr < arr.mean())
 
