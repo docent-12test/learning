@@ -2,15 +2,16 @@
 Ansi console styling module
 """
 
-# ANSI-stijl reset
+# Reset code
 RESET = "\033[0m"
 
-# Stijlen
+# Styles
 BOLD = "\033[1m"
 ITALIC = "\033[3m"
 UNDERLINE = "\033[4m"
+INVERT = "\033[7m"
 
-# Voorgrondkleuren
+# Foreground colours
 BLACK = "\033[30m"
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -20,7 +21,7 @@ MAGENTA = "\033[35m"
 CYAN = "\033[36m"
 WHITE = "\033[37m"
 
-# Helder (bright) voorgrondkleuren
+# Bright foreground colours
 BRIGHT_BLACK = "\033[90m"
 BRIGHT_RED = "\033[91m"
 BRIGHT_GREEN = "\033[92m"
@@ -30,7 +31,7 @@ BRIGHT_MAGENTA = "\033[95m"
 BRIGHT_CYAN = "\033[96m"
 BRIGHT_WHITE = "\033[97m"
 
-# Achtergrondkleuren
+# Background colours
 BG_BLACK = "\033[40m"
 BG_RED = "\033[41m"
 BG_GREEN = "\033[42m"
@@ -40,7 +41,7 @@ BG_MAGENTA = "\033[45m"
 BG_CYAN = "\033[46m"
 BG_WHITE = "\033[47m"
 
-# Helder (bright) achtergrondkleuren
+# Bright background colours
 BG_BRIGHT_BLACK = "\033[100m"
 BG_BRIGHT_RED = "\033[101m"
 BG_BRIGHT_GREEN = "\033[102m"
@@ -64,47 +65,99 @@ def reset():
     print(RESET, end='')
 
 
+def _generic_set_colour(colour: str) -> None:
+    """
+    Sets the terminal text color to the specified color.
+
+    This function is used to change the text color for terminal output. It resets
+    the terminal settings before applying the new color setting and ensures the
+    color is immediately applied via print.
+
+    :param colour: The name of the color to set the terminal text to.
+    """
+    reset()
+    print(colour, end='')
+
+
+def black():
+    """
+    Provides a function to reset the terminal color and set it to black.
+    :return:
+    """
+    _generic_set_colour(BLACK)
+
+
 def red():
     """
     Provides a function to reset the terminal color and set it to red.
     """
-    reset()
-    print(RED, end='')
+    _generic_set_colour(RED)
 
 
 def green():
     """
     Provides a function to reset the terminal color and set it to green
     """
-    reset()
-    print(GREEN, end='')
+    _generic_set_colour(GREEN)
 
 
 def yellow():
     """
     Provides a function to reset the terminal color and set it to yellow.
     """
-    reset()
-    print(YELLOW, end='')
+    _generic_set_colour(YELLOW)
 
 
 def blue():
     """
     Provides a function to reset the terminal color and set it to blue.
     """
-    reset()
-    print(BLUE, end='')
+    _generic_set_colour(BLUE)
+
+
+def cyan():
+    """
+    Provides a function to reset the terminal color and set it to cyan.
+    """
+    _generic_set_colour(MAGENTA)
 
 
 def magenta():
     """
     Provides a function to reset the terminal color and set it to magenta.
     """
+    _generic_set_colour(MAGENTA)
+
+
+def _print_generic(color_function: callable, text: str) -> None:
+    """
+    This function prints a styled text using a provided color formatting function.
+    The `color_function` is applied before the text is printed, and a reset operation
+    is performed thereafter. It ensures the text is displayed in the intended style
+    while resetting formatting for subsequent terminal output.
+
+    :param color_function: A callable that applies a color or style to the output text
+                           when invoked (e.g., a function for terminal color settings).
+    :param text: The text string to be printed, styled using the given `color_function`.
+    """
+    color_function()
+    print(text)
     reset()
-    print(MAGENTA, end='')
 
 
-def print_red(text):
+def print_black(text: str):
+    """
+    Prints the given text in black.
+
+    This function formats the provided text to be displayed in black
+    color by utilizing the necessary commands. It ensures that the
+    text output is temporarily styled in red and then resets the
+    styling after being printed.
+    """
+    _print_generic(black, text)
+
+
+def print_red(text: str):
     """
     Prints the given text in red color.
 
@@ -113,12 +166,10 @@ def print_red(text):
     text output is temporarily styled in red and then resets the
     styling after being printed.
     """
-    red()
-    print(text)
-    reset()
+    _print_generic(red, text)
 
 
-def print_green(text):
+def print_green(text: str):
     """
     Prints the given text in green color.
 
@@ -127,13 +178,10 @@ def print_green(text):
     text output is temporarily styled in red and then resets the
     styling after being printed.
     """
-
-    green()
-    print(text)
-    reset()
+    _print_generic(green, text)
 
 
-def print_yellow(text):
+def print_yellow(text: str):
     """
     Prints the given text in yellow color.
 
@@ -142,12 +190,10 @@ def print_yellow(text):
     text output is temporarily styled in red and then resets the
     styling after being printed.
     """
-    yellow()
-    print(text)
-    reset()
+    _print_generic(yellow, text)
 
 
-def print_blue(text):
+def print_blue(text: str):
     """
     Prints the given text in blue  color.
 
@@ -156,12 +202,10 @@ def print_blue(text):
     text output is temporarily styled in red and then resets the
     styling after being printed.
     """
-    blue()
-    print(text)
-    reset()
+    _print_generic(blue, text)
 
 
-def print_magenta(text):
+def print_cyan(text: str):
     """
     Prints the given text in magenta color.
 
@@ -170,7 +214,31 @@ def print_magenta(text):
     text output is temporarily styled in red and then resets the
     styling after being printed.
     """
+    _print_generic(cyan, text)
 
-    magenta()
-    print(text)
-    reset()
+
+def print_magenta(text: str):
+    """
+    Prints the given text in magenta color.
+
+    This function formats the provided text to be displayed in magenta
+    color by utilizing the necessary commands. It ensures that the
+    text output is temporarily styled in red and then resets the
+    styling after being printed.
+    """
+    _print_generic(magenta, text)
+
+
+def demo() -> None:
+    """
+    Demo function for the ansi module.
+    """
+    for style in range(8):
+        for fg in range(30, 38):
+            for bg in range(40, 48):
+                print(f"\033[{style};{fg};{bg}m {style};{fg};{bg} \033[0m", end="  ")
+            print()
+
+
+if __name__ == "__main__":
+    raise NotImplementedError(f"This module is not meant to be run directly: {__file__}")

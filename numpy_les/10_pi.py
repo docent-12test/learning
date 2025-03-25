@@ -43,3 +43,21 @@ plt.show()
 
 
 
+fig = plt.figure(figsize=(10, 8), alpha=0.5)
+ax = fig.add_subplot(111, projection='3d')
+
+# Raster coördinaten en waarden
+X, Y = np.meshgrid(np.arange(N + 1), np.arange(N + 1))
+Z = distance_squared
+
+# Plot de oppervlakte
+ax.plot_surface(X, Y, Z, cmap='viridis', edgecolor='none' ,alpha=0.5)
+
+# Labels en titel
+ax.set_title('3D Weergave van Afstand^2')
+ax.set_xlabel('X-as')
+ax.set_ylabel('Y-as')
+ax.set_zlabel('Afstand^2')
+
+# Toon de plot
+plt.show()
