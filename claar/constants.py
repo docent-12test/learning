@@ -1,8 +1,13 @@
 """
 Collection of constants
 """
+from decimal import Decimal
 
 # file sizes
+
+PERCENT = 100
+PERCENTAGE = Decimal('0.01')
+
 KB = 1024
 MB = KB * 1024
 GB = MB * 1024

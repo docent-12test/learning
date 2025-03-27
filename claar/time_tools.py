@@ -1,12 +1,14 @@
 """
 Time constants and method
 """
+
 import os
 import uuid
 from datetime import datetime, timedelta
 import time
 from typing import Optional, Callable
 
+from claar import html
 
 FORMAT_READABLE = '%d/%m/%y %H:%M:%S'
 FORMAT_SORTABLE = '%Y%m%d_%H%M%S'
@@ -157,21 +159,30 @@ class Lap:
         Right alignment indent
         :param indent: number of characters
         """
-        if indent < 1:
-            indent = 1
+        indent = max(indent, 1)  # Ensures minimum indent
         return f"LAP '{self.name:{indent}}' clicked at {self.start}, absolute {self.elapsed_since_start}, relative: {self.elapsed_since_previous}"
 
 
 class Stopwatch:
     """
-    Basic stopwatch functionality
+    A stopwatch class for measuring elapsed time and tracking laps.
+
+    Provides functionality to track laps, reset the stopwatch, and represent the
+    lap data in different formats such as a string or HTML representation.
+
+    :ivar start: Timestamp marking when the stopwatch was started.
+    :type start: datetime.datetime
+    :ivar previous_click: Timestamp of the previous lap or click event.
+    :type previous_click: datetime.datetime
+    :ivar laps: List of recorded laps.
+    :type laps: list[Lap]
     """
 
     def __init__(self) -> None:
         self.start = self.previous_click = datetime.now()
         self.laps = []
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         indent = max([len(lap.name) for lap in self.laps])
         return os.linesep.join(self.lap_list(indent))
 
@@ -188,9 +199,9 @@ class Stopwatch:
 
     def html(self) -> str:
         """
-        HTML representaion of the stopwatch
+        Create an HTML representation of the stopwatch laps.
         """
-        return f""" {"<BR/>".join(self.lap_list())}"""
+        return f"""{html.BREAK.join(self.lap_list())}"""
 
     def click_start(self) -> None:
         """
@@ -199,13 +210,16 @@ class Stopwatch:
         self.start = self.previous_click = datetime.now()
         self.laps = []
 
-    def click(self, name="") -> None:
+    def click(self, lap_name="") -> None:
         """
-        Add a lap
-        :param name: Optional name of the lap
+        Registers a click event with an optional name,
+        calculates the lap time, and updates the state.
+
+        :param lap_name: The optional name associated with the click event.
+        :return: None
         """
         new_click_time = datetime.now()
-        lap = Lap(self.start, self.previous_click, new_click_time, name)
+        lap = Lap(self.start, self.previous_click, new_click_time, lap_name)
         self.laps.append(lap)
         self.previous_click = new_click_time
 
