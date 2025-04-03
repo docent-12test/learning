@@ -11,19 +11,17 @@ class Person:
     def __repr__(self):
         return f"Person(name={self.name}, age={self.age})"
 
+if __name__ == "__main__":
+    a = Person()
+    print(a)
+    print(a.name)
+    print(a.age)
 
+    b = Person()
+    print(b)
+    print(b.name)
+    print(b.age)
 
-
-a = Person()
-print(a)
-print(a.name)
-print(a.age)
-
-b = Person()
-print(b)
-print(b.name)
-print(b.age)
-
-b.name = "Jane"
-print(b.name)
-print(a.name)
+    b.name = "Jane"
+    print(b.name)
+    print(a.name)

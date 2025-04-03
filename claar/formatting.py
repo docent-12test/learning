@@ -1,21 +1,10 @@
 """
-FILE_INFORMATION=Fluvius;Arvid Claassen;Core of ANM framework
-(C) Copyright 2024, Fluvius
-
 Formatting functionality to represent data in a more readable form
 """
 
 import os
 from typing import Iterable
 
-# ANSI Colour codes
-BLUE = "\033[34m"
-GRAY = "\033[90m"
-GREEN = "\033[32m"
-PINK = "\033[95m"
-RED = "\033[31m"
-YELLOW = "\033[33m"
-RESET = "\033[0m"
 
 # todo: unittest
 def list_str(input_list: Iterable, label: str = None) -> str:

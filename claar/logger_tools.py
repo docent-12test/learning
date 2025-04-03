@@ -1,15 +1,11 @@
 """
-FILE_INFORMATION=Fluvius;Arvid Claassen;Core of ANM framework
-(C) Copyright 2024, Fluvius
-
 Logging capabilities of the framework
 """
 import inspect
 import logging
 from typing import Union
-
-import server_config
-from lib.formatting import YELLOW, RED, GREEN, GRAY, RESET, BLUE
+from ansi import RED, BLUE, GREEN, YELLOW, RESET
+from claar.ansi import WHITE
 
 SCRIPT_LOGGER_NAME = "SCRIPT"
 FRAMEWORK_LOGGER_NAME = "FRAMEWORK"
@@ -41,7 +37,7 @@ LOGFILE_LABEL_DEBUG = 'DEBUG'  # Deze waarde mag aangepast worden, heeft enkel i
 
 
 # Unittest OK
-def log_level_value(level: Union[int, str], default: int = server_config.LOG_DEFAULT_LEVEL) -> Union[int, str]:
+def log_level_value(level: Union[int, str], default: int = logging.INFO) -> Union[int, str]:
     """
     Get the numeric log level
     :param level:
@@ -75,10 +71,7 @@ class ClassLogger:
         self.print_to_screen = False
         value = kwargs.get('print')
 
-        if value is not None and value:
-            self.print_to_screen = True
-        else:
-            self.print_to_screen = server_config.FRAMEWORK_STDOUT_LOGGING
+        self.print_to_screen = value is not None and value
         self.logger = logging.getLogger(self.logger_name())
         logging.addLevelName(logging.DEBUG, LOGFILE_LABEL_DEBUG)
         logging.addLevelName(logging.INFO, LOGFILE_LABEL_INFO)
@@ -143,7 +136,7 @@ class ClassLogger:
                            *messages,
                            pre_blanks=pre_blanks,
                            post_blanks=post_blanks,
-                           color_code=GRAY)
+                           color_code=WHITE)
 
     def debug___(self, *messages, pre_blanks=0, post_blanks=0):
         """
@@ -270,8 +263,6 @@ class FrameworkLogger(ClassLogger):
         :return:
         """
         return FRAMEWORK_LOGGER_NAME
-
-
 
 if __name__ == "__main__":
     raise NotImplementedError(f"This module is not meant to be run directly: {__file__}")

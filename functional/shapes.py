@@ -1,6 +1,7 @@
 """
-Shapes without OO
+Shapes without Object-Oriented Programming
 """
+
 
 SCREENWIDTH = 50
 SCREENHEIGHT = 30
@@ -27,7 +28,7 @@ def check_type(value, type_) -> bool:
     return True
 
 
-def check_types(*args):
+def check_types(*args) -> bool:
     """
     Checks the types of given arguments in pairs to ensure correctness.
 
@@ -43,6 +44,7 @@ def check_types(*args):
         raise ValueError("Must be an even number of arguments")
     for i in range(0, len(args), 2):
         check_type(args[i], args[i + 1])
+    return True
 
 
 def draw_squares() -> None:
@@ -114,23 +116,23 @@ Disadvantages:
    Use named constants or dictionaries to represent shape properties.
    
 2. Avoid using non-local variables to store data.
-   Instead, use class attributes or instance variables to store data.
+   Instead, pass variables to methods as arguments.
+
+3. Each method needs to the structure of the shape data.
    
+4. Each method needs to know what the properties of a shape are.
    
-2. **Extract Functions**:
-    - The logic for drawing squares could be split into smaller helper functions to improve clarity and reduce complexity.
+5. The introduction of other shapes (e.g., rectangles, circles) impacts each method.
 
-3. **Introduce Type Checking**:
-    - Add type hints and enforce better validation using Python's type annotations.
-
-
-
-The refactored code incorporates all these improvements:
-### Refactored Code
+6. What to do and how to do it are entangled.
 """
 
-def a(*args, **kwargs):
-    print(type(args))
-    print(type(kwargs))
+"""
+Oefening:
+   - Maak van shape een list of dictionaries met keys 'x', 'y', 'pos', 'side' en pas alle code hieraan aan
+   - Schrijf een method om de omtrek van alle shapes te berekenen.
+   - Zorg ervoor dat vormen die gedeeltelijk buiten het scherm vallen worden getekend. 
+   - Zorg ervoor dat ook rechthoeken (height en width) getekend kunnen worden.
+   - Uitbreiding: en cirkels (radius) getekend kunnen worden.
+²²"""
 
-a()

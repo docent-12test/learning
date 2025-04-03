@@ -47,4 +47,4 @@ def write_csv(filename: str, data: list, delimiter: str = DEFAULT_DELIMITER) -> 
 
 
 if __name__ == "__main__":
-    raise NotImplementedError(__file__)
+    raise NotImplementedError(f"This module is not meant to be run directly: {__file__}")

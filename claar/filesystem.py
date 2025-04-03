@@ -1,7 +1,4 @@
 """
-FILE_INFORMATION=Fluvius;Arvid Claassen;Core of ANM framework
-(C) Copyright 2024, Fluvius
-
 OS directory related functions
 """
 
@@ -9,7 +6,6 @@ import base64
 import hashlib
 import os
 import re
-import time_tools
 from datetime import datetime
 from os import listdir
 from os.path import isfile, join, getmtime
@@ -19,7 +15,6 @@ from claar import tools
 
 RENAME_LIMIT = 1000  # number limit when renaming file
 NUMBER_OF_STALE_MOUNT_CHECKS = 3
-NFS_OUTGOING = "/mnt/nfs_outgoing_docs/tbt/"
 
 
 def list_files(local_path: str,
@@ -184,91 +179,71 @@ DEFAULT_HASH_CHUNK = 4096
 DEFAULT_HASH_ALGORITHM = "sha256"
 
 
-def file_hash(path: str,
+def update_hash_with_chunks(file, hasher, chunk_size: int) -> None:
+    """
+    Update the hash object by reading the file in chunks.
+    :param file: file object opened in binary mode
+    :param hasher: hash object to be updated
+    :param chunk_size: size of chunks to read from the file
+    """
+    while chunk := file.read(chunk_size):  # Using the walrus operator for simplicity
+        hasher.update(chunk)
+
+
+def file_hash(file_path: str,
               algorithm: str = DEFAULT_HASH_ALGORITHM,
               chunk_size: int = DEFAULT_HASH_CHUNK,
               log_error: bool = False) -> Optional[str]:
     """
-    Generate hash code for the contents of a file
-    :param path: filepath
-    :param algorithm: hashing algorithm
-    :param chunk_size: hashing chunk size
-    :param log_error: if True and in case of error, the error will be logged
+    Generate a hash code for the contents of a file.
+
+    :param file_path: Path to the target file
+    :param algorithm: Hashing algorithm to use (default: sha256)
+    :param chunk_size: Size (in bytes) of the file chunks to read (default: 4096)
+    :param log_error: If True, logs the error in case of failure
+    :return: Hash value of the file contents as a hexadecimal string, or None if an error occurred
     """
-    hash_object = hashlib.new(algorithm)
-    try:
-        with open(path, 'rb') as file:
-            while True:
-                chunk = file.read(chunk_size)
-                if not chunk:
-                    break
-                hash_object.update(chunk)
-        hash_value = hash_object.hexdigest()
-    except Exception as e:
-        if log_error:
-            SCRIPT_LOGGER.critical(f"Error hashing: {e}")
-        return None
-    return hash_value
+    hasher = hashlib.new(algorithm)
+    with open(file_path, 'rb') as file:
+        update_hash_with_chunks(file, hasher, chunk_size)
+    return hasher.hexdigest()
 
 
-def count_lines(source_file: str) -> Optional[int]:
+def get_line_count(file_path: str) -> Optional[int]:
     """
-    count lines in fie
-    :param source_file: input file
-    :return: number of line or None
-    """
-    try:
-        with open(source_file, 'r') as fp:
-            for count, line in enumerate(fp):
-                pass
-            return count
-    except RuntimeError as e:
-        SCRIPT_LOGGER.warning(f"Issue while counting lines in {source_file}"
-                              f" ==> {e}")
-        return None
+    Counts the number of lines in the given file.
 
-
-def check_nfs_mount(mount_location: str) -> bool:
+    :param file_path: Path to the input file
+    :return: Number of lines in the file, or None if an error occurs
     """
-    Check NFS mount with timeout, to be used in other scripts before performing
-    actions on possible stale NFS mount point.
-    :param mount_location: mount point  to check
-    :return: True if mount is available,
-             False in case of any error (stale, not a mount, ...)
-    """
-    mounts = file_contents("/etc/mtab", split=True)
-    SCRIPT_LOGGER.debug(f"{mounts}")
-    nfs_mounts = [mount.split(" ")[1] for mount in mounts if "nfs" in mount]
-    SCRIPT_LOGGER.debug(f"{nfs_mounts}")
-    if mount_location not in nfs_mounts:
-        SCRIPT_LOGGER.debug(f"{mount_location} niet in {mounts}")
-        return False
-
-    for i in range(NUMBER_OF_STALE_MOUNT_CHECKS):
-        command = ["timeout",
-                   "5s",
-                   f"/bin/stat",
-                   "-f",
-                   f"{mount_location}"]
-        output, error, result_code = tools.run_linux_command(command)
-        if tools.none_or_empty(error) and result_code == 0:
-            return True
-        time.sleep(2)
-    SCRIPT_LOGGER.critical(f"{mount_location} is stale")
-    return False
+    line_count = 0  # Initialize line count
+    with open(file_path, 'rt') as file:
+        for line_count, _ in enumerate(file, start=1):  # Start count at 1
+            pass
+    return line_count
 
 
 def peek_line(infile, strip: bool = True) -> Optional[str]:
     """
-    Peek in a file for the next line, without progressing the file pointer
+    Reads the next line from a file object without advancing the read cursor.
+    It provides a way to preview the line to be read next, with an option to
+    strip whitespace from the line.
+
+    :param infile: File object supporting `tell`, `readline`, and `seek` methods.
+        This object should already be open and ready for reading.
+    :param strip: Whether to strip leading and trailing whitespace from the
+        previewed line. Defaults to True.
+    :return: The next line in the file as a string, or None if the end of the
+        file is reached.
     """
-    pos = infile.tell()
+    original_position = infile.tell()
     line = infile.readline()
-    infile.seek(pos)
-    if line is not None and strip:
+    infile.seek(original_position)
+    should_strip_whitespace = line is not None and strip
+    if should_strip_whitespace:
         line = line.strip()
     return line
 
 
 if __name__ == "__main__":
-    raise NotImplementedError(__file__)
+    raise NotImplementedError(f"This module is not meant to be run directly: {__file__}")

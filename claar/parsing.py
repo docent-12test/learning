@@ -1,48 +1,49 @@
 """
-FILE_INFORMATION=Fluvius;Arvid Claassen;Core of ANM framework
-(C) Copyright 2024, Fluvius
-
 Parsing functions
 """
-from decimal import Decimal
-# Unittest OK
-from typing import Union, Optional
 
-from framework.exceptions import FrameworkException
-from lib.dms.gridstate import GridState
-from lib.logger_tools import SCRIPT_LOGGER
+from decimal import Decimal
+from typing import Union, Optional
 from numbers import Real
 
-# todo: unittest
+from claar.exceptions import AppException
+
+
+def validate_and_convert(value: Union[str, Real]) -> Real:
+    """
+    Validate the input and convert it to a numeric value if it's a string.
+    :param value: The value to validate and convert.
+    :param param_name: The name of the parameter (for error messages).
+    :return: Numeric representation of the value.
+    """
+    if value is None:
+        raise TypeError(f"{value} is None")
+    if not isinstance(value, str) and not isinstance(value, Real):
+        raise TypeError(f"({value}) is niet str noch numeriek")
+    if isinstance(value, str):
+        if len(value) == 0:
+            raise TypeError(f"{value} is leeg")
+        try:
+            return float(value)
+        except ValueError:
+            raise TypeError(f"{value} kan niet omgezet worden naar een getal")
+    return value
+
+
 def add_int(value1: Union[str, Real], value2: Union[str, Real]) -> Optional[str]:
     """
-    Add a value to a string value, e.g.  '4' + 2 => '6'
-    :param value1: Value as str or numeric
-    :param value2: Value as str or numeric
-    :return: String format of the sum
+    Add a value to a string value, e.g., '4' + 2 => '6'.
+    :param value1: Value as str or numeric.
+    :param value2: Value as str or numeric.
+    :return: String format of the sum.
     """
-    if not value1:
-        raise TypeError(f"value1 ({value1}) is None or empty")
-    if not value2:
-        raise TypeError(f"value2 ({value2}) is None or empty")
-    if not isinstance(value1, str) and not isinstance(value1, Real):
-        raise TypeError(f"value1 ({value1}) is niet str noch numeriek")
-    if not isinstance(value2, str) and not isinstance(value2, Real):
-        raise TypeError(f"value2 ({value2}) is niet str noch numeriek")
-    if isinstance(value1, str):
-        try:
-            value1 = float(value1)
-        except:
-            raise TypeError(f"value1 ({value1}) is niet numeriek")
-    if isinstance(value2, str):
-        try:
-            value2 = float(value2)
-        except:
-            raise TypeError(f"value1 ({value2}) is niet numeriek")
+    num1 = validate_and_convert(value1)
+    num2 = validate_and_convert(value2)
+
     try:
-        return f"{int(value1 + value2)}"
-    except:
-        raise TypeError(f"value1 ({value1}) en value1 ({value1}) zijn niet optelbaar")
+        return f"{int(num1 + num2)}"
+    except (ValueError, TypeError) as e:
+        raise AppException(f"value1 ({num1}) en value2 ({num2}) zijn niet optelbaar") from e
 
 
 def check_type(variable, target_type, allowed_empty: bool = True):
@@ -73,43 +74,9 @@ def check_type(variable, target_type, allowed_empty: bool = True):
             temp = parse_boolean(variable)
             if temp is not None:
                 return temp
-        elif target_type == GridState:
-            temp = GridState.parse_grid_state(variable)
-            if temp is not None:
-                return temp
         raise AttributeError(f"variable: {variable} must be of type {target_type}")
     if str(variable) == '' and not allowed_empty:
         raise AttributeError(f"variable must not be empty")
-    return variable
-
-
-def check_type2(variable, target_type, allowed_empty: bool = True):
-    """
-    Verify the type and emptiness of a variable.
-    :param variable: Variable under consideration
-    :param target_type: type to check the variable against
-    :param allowed_empty: true if a variable may be empty
-    :return: Value of the variable  if everything checks out,
-             otherwise an AttributeError will be raised.
-    """
-    if not isinstance(variable, target_type):
-        try:
-            if target_type == int:
-                return int(variable)
-            elif target_type == float:
-                return float(variable)
-            elif target_type == bool:
-                return parse_boolean(variable)
-            elif target_type == GridState:
-                return GridState.parse_grid_state(variable)
-            else:
-                raise AttributeError(f"Variable: {variable} must be of type {target_type}")
-        except ValueError as ve:
-            raise AttributeError(f"Variable: {variable} could not be converted to type {target_type}: {ve}")
-
-    if not allowed_empty and not variable:
-        raise AttributeError("Variable must not be empty")
-
     return variable
 
 
@@ -128,7 +95,6 @@ def parse_boolean(text: str,
     """
     if text is None:
         return None
-
     upper = str(text).upper()
     if upper in true_values:
         return True
@@ -167,7 +133,7 @@ def parse_bitstring(value: str) -> list:
     :return: List of bools
     """
     if not isinstance(value, str):
-        raise FrameworkException(f"{value} must be a string")
+        raise AppException(f"{value} must be a string")
     ret = []
     for char in value:
         if char not in {'0', '1'}:
@@ -177,7 +143,7 @@ def parse_bitstring(value: str) -> list:
     return ret
 
 
-# Todo: unittest verder uitschrijven voor raise_exception parameter
+
 def parse_float(value: str, raise_exception=False) -> Optional[float]:
     """
     Convert a string representation of a float with decimal comma (i.s.o. decimal point)
@@ -220,7 +186,7 @@ def get_numeric_part(value: str) -> Optional[int]:
         return None
 
 
-# Unittest OK
+
 def cast_to_type(value, target_type) -> Union[str, float, int, bool, None]:
     """
     Cast a value to the specific type
@@ -294,7 +260,8 @@ def convert_string_to_list(value: str) -> Optional[list]:
         return None
 
 
-def match(value, regexps) -> bool:
+
+def match(value:str, regexps:List[str]) -> bool:
     """
     Try matching the value to the filter
     :param value: Value to match
@@ -304,32 +271,6 @@ def match(value, regexps) -> bool:
         if regexp.search(value):
             return True
     return False
-
-
-def layered_tuple_2_list(layered_tuple: tuple) -> dict:
-    """
-    Convert a multi-level tuple of tuples with base (X,Y) tuples into a dict  {X : Y}
-    :param layered_tuple:  multi-level tuple of tuples with base (X,Y)
-    :return: dict  {X : Y}
-    """
-
-    def _layered_tuple_2_list(_layered_tuple: tuple, target: dict) -> None:
-        """
-        Convert a multi-level tuple of tuples with base (X,Y) tuples into a dict  {X : Y}
-        :param _layered_tuple:  multi-level tuple of tuples with base (X,Y)
-        :param target: dict  {X : Y}
-        """
-        for entry in _layered_tuple:
-            if isinstance(entry, tuple):
-                _layered_tuple_2_list(entry, target)
-            else:
-                target[_layered_tuple[0]] = _layered_tuple[1]
-                break
-
-    ret = dict()
-    _layered_tuple_2_list(layered_tuple, ret)
-    return ret
-
 
 
 if __name__ == "__main__":

@@ -1,7 +1,4 @@
 """
-FILE_INFORMATION=Fluvius;Arvid Claassen;Core of ANM framework
-(C) Copyright 2023, Fluvius
-
 HTML related functionality
 """
 from typing import Union, Optional
