@@ -6,7 +6,6 @@ import os
 from typing import Iterable
 
 
-# todo: unittest
 def list_str(input_list: Iterable, label: str = None) -> str:
     """
     Printable version of a list
@@ -24,7 +23,7 @@ def list_str(input_list: Iterable, label: str = None) -> str:
 
 
 def dict_str(dictionary: dict,
-             label: str = None,
+             label: str = "",
              align_keys: bool = True) -> str:
     """
     Printable version of a dictionary.
@@ -35,7 +34,6 @@ def dict_str(dictionary: dict,
     """
     if dictionary is None:
         return "None"
-    label = "" if label is None else f"{label}: "
     ret = [f"{os.linesep}{label}==="]
     if len(dictionary) == 0:
         ret.append("dict is leeg")
@@ -100,9 +98,9 @@ FONT = {
     'L': [16, 16, 16, 16, 16, 16, 31],
     'M': [17, 27, 21, 17, 17, 17, 17],
     'N': [17, 25, 21, 19, 17, 17, 17],
-    'O': [14, 17, 17, 17, 17, 17, 14],  # 1     = 4
+    'O': [14, 17, 17, 17, 17, 17, 14],
     'P': [30, 17, 17, 30, 16, 16, 16],
-    'Q': [14, 17, 17, 17, 17, 19, 15],  # 1     = 4
+    'Q': [14, 17, 17, 17, 17, 19, 15],
     'R': [30, 17, 17, 30, 20, 18, 17],
     'S': [14, 17, 16, 14, 1, 17, 14],
     'T': [31, 4, 4, 4, 4, 4, 4],
@@ -147,7 +145,6 @@ def big_font(text: str) -> str:
         for i in range(7):
             buf[i * 2 + 1] += '  '
     return "".join(buf)
-
 
 
 if __name__ == "__main__":

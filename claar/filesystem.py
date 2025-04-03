@@ -11,7 +11,6 @@ from os import listdir
 from os.path import isfile, join, getmtime
 from typing import Optional, Union
 
-from claar import tools
 
 RENAME_LIMIT = 1000  # number limit when renaming file
 NUMBER_OF_STALE_MOUNT_CHECKS = 3
@@ -31,20 +30,16 @@ def list_files(local_path: str,
     :param full_path: if True the path is added to the filename(s)
     :return: list of  filenames
     """
-    try:
-        files = [f for f in listdir(local_path) if isfile(join(local_path, f))]
-        if pattern is not None:
-            files = [f for f in files if re.search(pattern, f)]
-        if older_than is not None:
-            files = [f for f in files if getmtime(join(local_path, f)) <= time.time() - 24 * 60 * 60 * older_than]
-        if younger_than is not None:
-            files = [f for f in files if getmtime(join(local_path, f)) >= time.time() - 24 * 60 * 60 * younger_than]
-        if full_path:
-            files = [join(local_path, f) for f in files]
-        return files
-    except RuntimeError as e:
-        SCRIPT_LOGGER.debug(e)
-        return None
+    files = [f for f in listdir(local_path) if isfile(join(local_path, f))]
+    if pattern is not None:
+        files = [f for f in files if re.search(pattern, f)]
+    if older_than is not None:
+        files = [f for f in files if getmtime(join(local_path, f)) <= time.time() - 24 * 60 * 60 * older_than]
+    if younger_than is not None:
+        files = [f for f in files if getmtime(join(local_path, f)) >= time.time() - 24 * 60 * 60 * younger_than]
+    if full_path:
+        files = [join(local_path, f) for f in files]
+    return files
 
 
 def rename_with_date(file_name: str,
@@ -85,19 +80,10 @@ def create_directory(path: str) -> bool:
     :return: True if directory already exists or is created successfully
     """
     if os.path.isdir(path):
-        SCRIPT_LOGGER.debug("Path {path} already exists as directory. "
-                            "No need to recreate it")
         return True
     if os.path.exists(path):
-        SCRIPT_LOGGER.debug("Path {path} already, but not as a directory."
-                            " Can not create it")
         return False
-    try:
-        os.mkdir(path)
-    except RuntimeError as e:
-        SCRIPT_LOGGER.warning(f"Issue hen creating {path}. "
-                              f"Can not create it ==> {e}")
-        return False
+    os.mkdir(path)
     return True
 
 
@@ -192,8 +178,7 @@ def update_hash_with_chunks(file, hasher, chunk_size: int) -> None:
 
 def file_hash(file_path: str,
               algorithm: str = DEFAULT_HASH_ALGORITHM,
-              chunk_size: int = DEFAULT_HASH_CHUNK,
-              log_error: bool = False) -> Optional[str]:
+              chunk_size: int = DEFAULT_HASH_CHUNK) -> Optional[str]:
     """
     Generate a hash code for the contents of a file.
 

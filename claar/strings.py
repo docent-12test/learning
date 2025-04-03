@@ -90,6 +90,5 @@ def scramble(string: str) -> Optional[str]:
     return shuffled_string
 
 
-
 if __name__ == "__main__":
     raise NotImplementedError(f"This module is not meant to be run directly: {__file__}")

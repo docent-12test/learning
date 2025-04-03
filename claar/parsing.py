@@ -1,9 +1,9 @@
 """
 Parsing functions
 """
-
+import re
 from decimal import Decimal
-from typing import Union, Optional
+from typing import Union, Optional, List
 from numbers import Real
 
 from claar.exceptions import AppException
@@ -186,7 +186,6 @@ def get_numeric_part(value: str) -> Optional[int]:
         return None
 
 
-
 def cast_to_type(value, target_type) -> Union[str, float, int, bool, None]:
     """
     Cast a value to the specific type
@@ -221,7 +220,7 @@ def convert_value_to_base_unit(value: Union[int, float], unit_text: str, unit: s
         if unit_text[:].upper() == unit[:].upper():  # fails if either one is None
             return value * 1.0
         if unit_text[1:].upper() != unit.upper():
-            raise FrameworkException(f"Can not interpret unit '{unit_text}'. "
+            raise AppException(f"Can not interpret unit '{unit_text}'. "
                                      f"It is not expressed in G{unit}, "
                                      f"M{unit}, k{unit} or {unit}")
         letter = unit_text[0]
@@ -232,36 +231,16 @@ def convert_value_to_base_unit(value: Union[int, float], unit_text: str, unit: s
         elif letter == "m":
             return value * 1000.0
         else:
-            raise FrameworkException(f"Can not interpret unit '{unit_text}'. "
+            raise AppException(f"Can not interpret unit '{unit_text}'. "
                                      f"It is not expressed in G{unit}, M{unit}, k{unit}, {unit} or m{unit}")
     except Exception as e:
-        raise FrameworkException(f"Can not interpret unit in convert_value_to_base_unit({value}, {unit_text}, {unit} ==> {e}")
-
-
-def convert_string_to_list(value: str) -> Optional[list]:
-    """
-    Convert a string of the form '[X,Y,Z]' to a python list ['X','Y','Z']
-    :param value: string of the form '[X,Y,Z]'
-    :return: list of string
-    """
-    try:
-        value = value.replace(' ', '')
-        if len(value) < 2:
-            raise FrameworkException(f"'{value}' is too short")
-        if value[0] != '[' or value[-1] != ']':
-            raise FrameworkException(f"'{value}' must start with [ and with ]")
-        if value == '[]':
-            return []
-        value = value[1:-1]
-        value = value.split(',')
-        return value
-    except Exception as e:
-        SCRIPT_LOGGER.debug(f"Could not convert value  ==> {e}")
-        return None
+        raise AppException(f"Can not interpret unit in convert_value_to_base_unit({value}, {unit_text}, {unit} ==> {e}")
 
 
 
-def match(value:str, regexps:List[str]) -> bool:
+
+
+def match(value:str, regexps:List[re.Pattern]) -> bool:
     """
     Try matching the value to the filter
     :param value: Value to match

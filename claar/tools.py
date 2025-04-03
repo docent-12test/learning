@@ -1,52 +1,61 @@
 """
-General functionality
+General code tools
 """
 import math
-
-iimport subprocess
-from typing import Union
+import subprocess
+from typing import Union, List, Iterable
 
 from claar import filesystem
 from claar.exceptions import AppException
 
 
-def safe_call(return_count: int=1) :
+def safe_duplicate(return_size: int):
     """
-    Function to create a decorator that applies error handling and wraps the output
-    of a callable in a consistent tuple-based structure.
+    Decorator that adds safe handling functionality to a function. This decorator modifies
+    the behavior of the function by introducing two alternatives: a normal execution (`normal_result`)
+    and a safe execution (`safe`). The safe execution handles exceptions gracefully by replacing
+    the result with a tuple of `None` values of length `param` followed by an error message.
 
-    This function generates a decorator that enhances the resilience of a callable by:
-    - Wrapping it in a try-except block to handle exceptions gracefully.
-    - Ensuring a tuple is returned with a predictable number of slots,
-      each corresponding to either an output value of the callable, `None`, or an error message.
-
-    This utility is particularly useful for cases where robust error handling and consistent
-    output structure are required by the caller, facilitating robust downstream processing.
-
-    :param return_count: Number of expected return slots in the tuple. The decorated
-        function's output values will populate the first slots, followed by `None`
-        or an error message in case of failure.
-        Defaults to 1.
-    :type return_count: int
-    :return: A decorator that applies the tuple-based error handling structure to the
-        given function.
+    :param return_size: A positive integer indicating the number of `None` elements to prepend
+                  in the tuple when the decorated function encounters an exception.
+    :type return_size: int
+    :return: A wrapper function that modifies the behavior of the original function by adding
+             safe handling capabilities.
     :rtype: Callable
     """
 
     def decorator(func):
         """
-        Decorator that wraps a function with error handling and ensures a consistent tuple-based result.
+        A decorator
+        :param func: The number of `None` values to include in the result when an
+                      exception is raised.
+        :type func: Callable
         """
-        def wrapper(*args, **kwargs):
+
+        def normal_result(*args, **kwargs):
             """
-            Decorator to wrap a function with error handling and return a consistent tuple-based result.
+            Normal execution of the decorated function. This function simply calls the original
+            :param args: args
+            :param kwargs: kwargs
+            :return: normal result
+            """
+            return func(*args, **kwargs)
+
+        def safe(*args, **kwargs):
+            """
+            normal execution of the decorated function. This function simply calls the original, but adds an error
+            message to the result if an exception is raised. The error message is None in case of
             """
             try:
-                res = func(*args, **kwargs)
-                return res, None
+                result = func(*args, **kwargs)
+                return result + (None,)
             except Exception as e:
-                return (None,) * return_count + (f"Error occurred: {e}",)
-        return wrapper
+                return (None,) * return_size + (f"Error occurred: {e}",)
+
+        func.normal_result = normal_result
+        func.safe = safe
+        return func
+
     return decorator
 
 
@@ -59,7 +68,6 @@ def run_command(command_parts: list,
     :param input_string: String input for command
     :param input_file: File that contains input string
     :param command_parts: Command to run
-    :param server: Server to run the command on
     :param split_output: if true the output will be split in lines
     :return: output lines, error, OS returncode
     """
@@ -78,9 +86,9 @@ def run_command(command_parts: list,
     proc.stdout.close()
     proc.stderr.close()
     if split_output:
-        stdout = stdout.split('\n')
+        stdout = stdout.split(b'\n')
     if stdout and stdout[-1] == '':
-        stdout.pop(-1)
+        stdout.pop()
     return stdout, stderr, return_code
 
 
@@ -103,25 +111,26 @@ def starts_with_from_list(string: str,
     return False
 
 
-def count_none_values(*values: object) -> int:
+def count_none_values(collection: Iterable) -> int:
     """
     Count the number of None values in the provided arguments.
 
-    :param values: Iterable of values to be checked.
+    :param collection: Iterable of values to be checked.
     :return: Number of None values.
     """
-    none_values = [_ for _ in values if _ is None]
+    none_values = [_ for _ in collection if _ is None]
     return len(none_values)
 
-def first_non_none(*args, default=None) -> object:
+
+def first_non_none(collection: Iterable, default=None) -> object:
     """
     Returns the first non-None value from the arguments.
 
-    :param args: Arguments to check.
+    :param collection: Arguments to check.
     :param default: Value to return if all arguments are None.
     :return: The first non-None value or the default.
     """
-    for value in args:
+    for value in collection:
         if value is not None:
             return value
     return default
@@ -130,16 +139,16 @@ def first_non_none(*args, default=None) -> object:
 def split_list(input_list: list,
                size: int,
                complete_last: bool = False,
-               default_value=None) -> list:
+               default_value=None) -> List[List]:
     """
     Split a list into parts of a specific size.
 
     :param input_list: List to split
-    :param size: Size of the sublists
+    :param size: Size of the sub lists
     :param complete_last: If True, default values will be added to the last
                           part to match the required size
     :param default_value: Value to use when completing the last part
-    :return: List of sublists
+    :return: List of sub lists
     """
     if size < 1:
         raise ValueError(f"Size {size} must be strictly positive")
@@ -151,12 +160,11 @@ def split_list(input_list: list,
     result = [input_list[i * size:(i + 1) * size] for i in range(num_chunks)]
 
     if complete_last and result:
-        result[-1] = complete_last_part(result[-1], size, default_value)
-
+        result[-1] = result[-1] + [default_value] * (size - len(result[-1]))
     return result
 
 
-def add_to_collection(value: object, target: Union[list, set]) -> None:
+def add_to(value: object, target: Union[list, set]) -> None:
     """
     Add a value to a list or a set
     :param value: Value to add
@@ -167,21 +175,28 @@ def add_to_collection(value: object, target: Union[list, set]) -> None:
     elif isinstance(target, set):
         target.add(value)
     else:
-        raise NotImplementedError(f"add_to_collection is not supporting target type {type(target)}")
+        raise NotImplementedError(f"add_to is not supporting target type {type(target)}")
 
 
-def pop_keys(dict_: dict, must_be_empty: bool, *keys) -> bool:
+def pop_keys(source_dict: dict,
+             keys: Iterable,
+             must_exist: bool = False,
+             must_be_empty: bool = False) -> bool:
     """
-    Remove one or more items from a dict
-    :param dict_: source dict
-    :param must_be_empty: if True
-    :param keys: all keys to be removed from the dict
-    :return: True if keys were removed.
-             False if dict is still not empty and it must be empty
+    Remove one or more items from a dictionary.
+    :param source_dict: The dictionary to remove keys from.
+    :param keys: The keys that should be removed from the dictionary.
+    :param must_exist: If True, raises KeyError if any key is missing.
+    :param must_be_empty: If True, validates that the dictionary is empty after removals.
+    :return: True if keys were removed (and the resulting dictionary is empty if required),
+             False if the dictionary is not empty when it must be.
     """
     for key in keys:
-        dict_.pop(key)
-    if must_be_empty and len(dict_):
+        if must_exist:
+            source_dict.pop(key)
+        else:
+            source_dict.pop(key, None)
+    if must_be_empty and source_dict:
         return False
     return True
 
