@@ -14,7 +14,7 @@ class Coordinate:
     checks, inequality checks, and allows for usage in hashed data structures 
     like sets.
 
-    :ivar x: The x-coordinate value.
+    :ivar x: The x-coordinate value.²
     :type x: int
     :ivar y: The y-coordinate value.
     :type y: int

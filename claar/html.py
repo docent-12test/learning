@@ -20,7 +20,6 @@ STRONG_CLOSE = "</STRONG>"
 EMPTY_CELL = f"{TABLE_CELL_OPEN}no data{TABLE_CELL_CLOSE}"
 
 
-# unittest OK
 def enclose(msg: str, tag: str, style: str = "") -> str:
     """
     Enclose a message between HTML tags,
@@ -35,7 +34,6 @@ def enclose(msg: str, tag: str, style: str = "") -> str:
         return f"<{tag}>{msg}</{tag}>"
 
 
-# unittest OK
 def strong(msg: str, style: str = "") -> str:
     """
     Turn the message to an BOLD html text
@@ -46,7 +44,6 @@ def strong(msg: str, style: str = "") -> str:
     return enclose(msg, "STRONG", style)
 
 
-# unittest OK
 def italic(msg: str, style: str = "") -> str:
     """
     Turn the message to an BOLD html text
@@ -57,7 +54,6 @@ def italic(msg: str, style: str = "") -> str:
     return enclose(msg, "I", style)
 
 
-# unittest OK
 def underline(msg: str, style: str = "") -> str:
     """
     Turn the message to an BOLD html text
@@ -97,7 +93,7 @@ def list_to_table_row(row: Optional[list], include_row_tag: bool = True) -> str:
 def html_table(input_list: list):
     """
     Create an HTML table from a list[list]
-    :param input_list: list to represent in HTML
+    :param input_list: list to represent
     :return: HTML code
     """
     html_code = TABLE_OPEN
@@ -110,19 +106,19 @@ def html_table(input_list: list):
     return html_code
 
 
-# todo: unittest
-def replace_html_entities(source: str, character_list: Union[tuple, list, set] = ('&', '<', '>', '/', '%', '\\', '\'', '\"')) -> str:
+def replace_html_entities(source: str,
+                          character_list: Union[tuple, list, set] = ('&', '<', '>', '/', '%', '\\', '\'', '\"')) -> str:
     """
     Replace unsafe characters with their entity representation.
     :param source: Input string
-    :param character_list: list of unsafe which characters to consider unsafe. The default is ('&', '<', '>',  '\'', '\"')
+    :param character_list: list of unsafe which characters to consider unsafe.
+                           The default is ('&', '<', '>',  '\'', '\"')
     :return: string with safe character
     """
     ret = source
     for char in character_list:
         ret = ret.replace(char, f"&#{ord(char)};")
     return ret
-
 
 
 if __name__ == "__main__":

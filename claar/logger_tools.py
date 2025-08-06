@@ -5,12 +5,9 @@ import inspect
 import logging
 from dataclasses import dataclass
 from typing import Union
-from ansi import RED, BLUE, GREEN, YELLOW, WHITE, RESET, MAGENTA, BRIGHT_RED
+from ansi import RED, BLUE, GREEN, WHITE, RESET, BRIGHT_RED
 
-SCRIPT_LOGGER_NAME = "SCRIPT"
-
-SCRIPT_LOGGER = logging.getLogger(SCRIPT_LOGGER_NAME)
-SCRIPT_LOGGER.setLevel(logging.DEBUG)
+APPLICATION_LOGGER_NAME = "CENTRAL_LOGGER"
 
 
 @dataclass
@@ -80,15 +77,15 @@ def parse_log_level_name(level_name: str) -> int:
     return LOG_LEVEL_NAMES.get(level_name, logging.DEBUG)
 
 
-class ClassLogger:
+class _Logger:
     """
-    Class to extend takes an external log and adds log functions
+    Class to add a logger and add log functions
+    The method logger_name() should be overloaded to decide to which logger to output
     """
 
     def __init__(self,
                  print_to_screen: bool = False) -> None:
         self.print_to_screen = print_to_screen
-
         self.logger = logging.getLogger(self.logger_name())
         logging.addLevelName(logging.DEBUG, DebugInfo.label)
         logging.addLevelName(logging.INFO, InfoInfo.label)
@@ -101,11 +98,10 @@ class ClassLogger:
 
     def logger_name(self):
         """
-        By default, the logger for this class is identified by its class name.
         This method should be overloaded if instances want to share a loggers by returning a globally known name.
         :return: Class name
         """
-        return self.__class__.__name__
+        pass
 
     def _log_message(self, func, message="") -> None:
         """
@@ -323,13 +319,56 @@ class ClassLogger:
                 break
 
 
+class ApplicationLogger(_Logger):
+    """
+    A specialized logger class designed for application-central logging.
+
+    This class inherits from the `_Logger` base class and serves as a
+    custom implementation tailored for application-level logging needs.
+
+    :ivar print_to_screen: Flag indicating whether log messages should
+        be printed to the screen.
+    :type print_to_screen: bool
+    """
+
+    def __init__(self,
+                 print_to_screen: bool = False) -> None:
+        _Logger.__init__(self, print_to_screen)
+
+    def logger_name(self):
+        return APPLICATION_LOGGER_NAME
+
+
+class ClassLogger(_Logger):
+    """
+    A specialized logger class designed for application-central logging.
+
+    :ivar print_to_screen: Indicates if logging output should be
+        printed to the screen.
+    :type print_to_screen: bool
+    """
+
+    def __init__(self,
+                 print_to_screen: bool = False) -> None:
+        _Logger.__init__(self, print_to_screen)
+
+    def logger_name(self):
+        return self.__class__.__name__
+
+
+class GroupedLogger(_Logger):
+
+    def __init__(self,
+                 name: str,
+                 print_to_screen: bool = False) -> None:
+        self.name = name
+        _Logger.__init__(self, print_to_screen)
+
+    def logger_name(self):
+        return self.name
+
+
+SCRIPT_LOGGER = ApplicationLogger(print_to_screen=True)
 
 if __name__ == "__main__":
-    # raise NotImplementedError(f"This module is not meant to be run directly: {__file__}")
-    c = ClassLogger()
-    c.logger.setLevel(logging.DEBUG)
-    c.debug("This is a debug message")
-    c.info("This is an info message")
-    c.warning("This is a warning message")
-    c.error("This is an error message")
-    c.critical("This is a critical message")
+    raise NotImplementedError(f"This module is not meant to be run directly: {__file__}")
